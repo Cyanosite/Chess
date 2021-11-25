@@ -1,5 +1,4 @@
-#include <stdbool.h>
-#include <SDL2/SDL2_gfxPrimitives.h>
+//#include <SDL2/SDL2_gfxPrimitives.h>
 #include "data_structure.h"
 #include "logic.h" // compiler won't see some functions when needed if the header isn't included
 #include "debugmalloc.h"

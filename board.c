@@ -1,12 +1,12 @@
-#include <stdbool.h>
-#include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include "data_structure.h"
 #include "sdl_init.h"
 #include "debugmalloc.h"
 #define len 130
+const char typestring[6][7] = {{"bishop"}, {"king"}, {"knight"}, {"pawn"}, {"queen"}, {"rook"}};
 
 // draws a rounded rectangle around the selected piece (only if it has valid moves)
 // param: renderer, coordinates of the field to draw a circle around
