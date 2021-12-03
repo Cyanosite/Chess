@@ -30,12 +30,12 @@ void draw_valid(SDL_Renderer *renderer, Pieces board[][8], int *valid, int size)
 
 // select screen to transform the pawn when it reaches the end of the board
 // param: renderer, board, destination coordinates of the pawn
-void select_pawn(SDL_Renderer *renderer, Pieces board[][8], int y, int x)
+void select_pawn(SDL_Renderer *renderer, SDL_Window *window, Pieces board[][8], int y, int x)
 {
-    boxRGBA(renderer, len * 10, len * 1, len * 11, len * 2, 210, 140, 69, 255);
-    boxRGBA(renderer, len * 11, len * 1, len * 12, len * 2, 255, 206, 158, 255);
-    boxRGBA(renderer, len * 10, len * 2, len * 11, len * 3, 255, 206, 158, 255);
-    boxRGBA(renderer, len * 11, len * 2, len * 12, len * 3, 210, 140, 69, 255);
+    boxRGBA(renderer, 1150, 130, 1280, 260, 210, 140, 69, 255);
+    boxRGBA(renderer, 1280, 130, 1410, 260, 255, 206, 158, 255);
+    boxRGBA(renderer, 1150, 260, 1280, 390, 255, 206, 158, 255);
+    boxRGBA(renderer, 1280, 260, 1410, 390, 210, 140, 69, 255);
     Type pieces[2][2] = {{queen, rook}, {bishop, knight}};
     SDL_Surface *piece;
     for (int i = 0; i < 2; ++i)
@@ -46,23 +46,26 @@ void select_pawn(SDL_Renderer *renderer, Pieces board[][8], int y, int x)
             sprintf(string, "Pieces/%s_%s.png", board[y][x].color == black ? "black" : "white", typestring[pieces[i][j]]);
             piece = IMG_Load(string);
             SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, piece);
-            SDL_Rect rectangle = {len * (10 + i), len * (1 + j), piece->w, piece->h};
+            SDL_Rect rectangle = {1150 + len * i, 130 + len * j, piece->w, piece->h};
             SDL_RenderCopy(renderer, texture, NULL, &rectangle);
             SDL_DestroyTexture(texture);
             SDL_FreeSurface(piece);
         }
-        SDL_RenderPresent(renderer);
     }
+    roundedRectangleRGBA(renderer, 1150, 130, 1412, 392, 0, 255, 255, 255, 255);
+    SDL_RenderPresent(renderer);
+    int w, h;
+    SDL_GetWindowSize(window, &w, &h);
     SDL_Event event;
     while (SDL_WaitEvent(&event))
     {
         if (event.type == SDL_MOUSEBUTTONDOWN)
         {
-            int tempx = event.button.x / len;
-            int tempy = event.button.y / len;
-            if (tempx > 9 && tempx < 12 && tempy > 0 && tempy < 3)
+            int tempx = (event.button.x - 1150 * w / 1920.0) / len;
+            int tempy = (event.button.y - 130 * h / 1080.0) / len;
+            if (tempx >= 0 && tempx < 2 && tempy >= 0 && tempy < 2)
             {
-                board[y][x].type = pieces[tempx - 10][tempy - 1];
+                board[y][x].type = pieces[tempx][tempy];
                 break;
             }
         }
@@ -155,7 +158,7 @@ void screen_refresh(Pieces board[][8], SDL_Renderer *renderer, SDL_Window *windo
 {
     FILE *txt = fopen("save.txt", "w");
     fprintf(txt, "%d %d \n", txt == NULL ? 0 : 1, player);
-    SDL_SetRenderDrawColor(renderer, 12, 0, 17, 255); // Midnight Purple HEX: #0c0011 RGB: (12, 0, 17)
+    SDL_SetRenderDrawColor(renderer, 186, 140, 99, 255);
     SDL_RenderClear(renderer);
     display_default(renderer, window);
     for (int i = 0; i < 8; ++i)
@@ -183,17 +186,18 @@ void screen_refresh(Pieces board[][8], SDL_Renderer *renderer, SDL_Window *windo
     char string[13];
     for (int i = 0; i < 5 && lastmove != NULL; ++i)
     {
-        int w, h;
-        SDL_GetWindowSize(window, &w, &h);
-        boxRGBA(renderer, w - 200, h - (i * 100) - 100, w, h - (i * 100), 200 + (i * 10), 200 + (i * 10), 200 + (i * 10), 255);
+        roundedRectangleRGBA(renderer, 1650, 530 - 100 * i, 1850, 605 - 100 * i, 5, 255, 255, 255, 255);
+        roundedBoxRGBA(renderer, 1650, 530 - 100 * i, 1850, 605 - 100 * i, 5, 255, 255, 255, 100);
+        //boxRGBA(renderer, w - 200, h - (i * 100) - 100, w, h - (i * 100), 200 + (i * 10), 200 + (i * 10), 200 + (i * 10), 255);
 
         sprintf(string, "%c%d -> %c%d", 65 + lastmove->x1, 8 - lastmove->y1, 65 + lastmove->x2, 8 - lastmove->y2);
-        create_text(Font, renderer, string, w - 150, h - (i * 100) - 70);
+        create_text(Font, renderer, string, 1710, 545 - 100 * i);
         lastmove = lastmove->next;
     }
-    boxRGBA(renderer, 1081, 0, 1280, 50, 200, 200, 200, 255);
-    sprintf(string, "%s moves!", player == black ? "Black" : "White");
-    create_text(Font, renderer, string, 1090, 5);
+    roundedRectangleRGBA(renderer, 1150, 900, 1410, 975, 5, 255, 255, 255, 255);
+    roundedBoxRGBA(renderer, 1150, 900, 1410, 975, 5, 255, 255, 255, 100);
+    sprintf(string, "%s MOVES!", player == black ? "BLACK" : "WHITE");
+    create_text(Font, renderer, string, 1200, 915);
     TTF_CloseFont(Font);
     fclose(txt);
     SDL_RenderPresent(renderer);
@@ -201,31 +205,37 @@ void screen_refresh(Pieces board[][8], SDL_Renderer *renderer, SDL_Window *windo
 
 // returns coordinates from the clicked pixel coordinates
 // param: event, y, x (pointer to the coordinates to edit)
-void get_field(SDL_Event *event, int *y, int *x)
+void get_field(SDL_Event *event, SDL_Window *window, int *y, int *x)
 {
+    int w, h;
+    SDL_GetWindowSize(window, &w, &h);
     int tempx = event->button.x;
     int tempy = event->button.y;
-    if (tempy < len * 8 && tempx < len * 8)
+    if (tempy < (len * 8) * h / 1080.0 && tempx < (len * 8) * w / 1920.0)
     {
-        *y = tempy / len;
-        *x = tempx / len;
+        *y = tempy / (len * h / 1080.0);
+        *x = tempx / (len * w / 1920.0);
+        return;
     }
-    else if (tempy < 50)
+    if (tempx > 1150 * w / 1920.0 && tempx < 1410 * w / 1920.0)
     {
-        if (tempx > 1823) // Exit button
-        {
-            *y = 8;
-            *x = 8;
-        }
-        else if (tempx < 1824 && tempx > 1631) // New Game button
+        if (tempy > 700 * h / 1080.0 && tempy < 775 * h / 1080.0)
         {
             *y = 9;
             *x = 9;
+            return;
         }
-        else if (tempx < 1632 && tempx > 1420) // Revert button
+        else if (tempy > 800 * h / 1080.0 && tempy < 875 * h / 1080.0)
         {
             *y = 10;
             *x = 10;
+            return;
         }
+    }
+    if (tempx > 1830 * w / 1920.0 && tempy < 50 * h / 1080.0)
+    {
+        *y = 8;
+        *x = 8;
+        return;
     }
 }

@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 			if (selected)
 			{
 				int y2 = -1, x2 = -1; // destination of the selected piece
-				get_field(&event, &y2, &x2);
+				get_field(&event, window, &y2, &x2);
 				if (y2 != -1 && x2 != -1)
 				{
 					for (int i = 0; i < size / 2; ++i)
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 								board[y1][x1] = (Pieces){0};
 								if ((y2 == 0 || y2 == 7) && board[y2][x2].type == pawn) // if the pawn reaches the end of the board make it transform
 								{
-									select_pawn(renderer, board, y2, x2);
+									select_pawn(renderer, window, board, y2, x2);
 								}
 							}
 							// resetting variables
@@ -79,15 +79,13 @@ int main(int argc, char *argv[])
 								{
 									if (check_mate(board, player))
 									{
-										int w, h;
-										SDL_GetWindowSize(window, &w, &h);
-										boxRGBA(renderer, 1500, h / 2 - 100, 1800, h / 2 + 50, 186, 140, 99, 255);
-
 										TTF_Font *Font = TTF_OpenFont("Font.ttf", 34);
 										char string[14];
 										player = invert_color(player);
-										sprintf(string, "%s has won!", player == black ? "Black" : "White");
-										create_text(Font, renderer, string, 1530, h / 2 - 50);
+										roundedRectangleRGBA(renderer, 1150, 450, 1410, 600, 5, 255, 255, 255, 255);
+										roundedBoxRGBA(renderer, 1150, 450, 1410, 600, 5, 255, 255, 255, 100);
+										sprintf(string, "%s WINS!", player == black ? "WHITE" : "WHITE");
+										create_text(Font, renderer, string, 1200, 500);
 										TTF_CloseFont(Font);
 
 										SDL_RenderPresent(renderer);
@@ -99,7 +97,7 @@ int main(int argc, char *argv[])
 											if (tempevent.type == SDL_MOUSEBUTTONDOWN)
 											{
 												int y = 0, x = 0;
-												get_field(&tempevent, &y, &x);
+												get_field(&tempevent, window, &y, &x);
 												if (y == 8 && x == 8) // Quit
 												{
 													screen_refresh(board, renderer, window, player, lastmove);
@@ -138,7 +136,7 @@ int main(int argc, char *argv[])
 				}
 			}
 			if (y1 == -1 && x1 == -1)
-				get_field(&event, &y1, &x1);
+				get_field(&event, window, &y1, &x1);
 			if (y1 < 8 && x1 < 8) // if the player has clicked the board
 			{
 				if (board[y1][x1].color == player) // if the Piece on the click's coordinates matches the color of the player

@@ -42,7 +42,9 @@ int SDL_Init_chess(int argc, char *argv[], SDL_Window **window, SDL_Renderer **r
         printf("Error %s\n", SDL_GetError());
         return 5;
     }
-
+    int w, h;
+    SDL_GetWindowSize(*window, &w, &h);
+    SDL_RenderSetScale(*renderer, w / 1920.0, h / 1080.0);
     SDL_RenderClear(*renderer);
 }
 
@@ -129,14 +131,17 @@ void display_default(SDL_Renderer *renderer, SDL_Window *window)
     int w, h;
     SDL_GetWindowSize(window, &w, &h);
     // Exit button with resolution scaling COORDINATE (8,8)
-    boxRGBA(renderer, w - w * 0.05, 0, w, 50, 200, 200, 200, 255);
-    create_text(Font, renderer, "EXIT", w - w * 0.041, 5);
+    roundedRectangleRGBA(renderer, 1830, 5, 1915, 50, 5, 255, 255, 255, 255);
+    roundedBoxRGBA(renderer, 1830, 5, 1915, 50, 5, 255, 255, 255, 100);
+    create_text(Font, renderer, "EXIT", 1850, 5);
     // New Game button with resolution scaling COORDINATE (9, 9)
-    boxRGBA(renderer, w - w * 0.15, 0, w - w * 0.05, 50, 100, 100, 100, 255);
-    create_text(Font, renderer, "NEW GAME", w - w * 0.14, 5);
+    roundedRectangleRGBA(renderer, 1150, 700, 1410, 775, 5, 255, 255, 255, 255);
+    roundedBoxRGBA(renderer, 1150, 700, 1410, 775, 5, 255, 255, 255, 100);
+    create_text(Font, renderer, "NEW GAME", 1220, 715);
     // Revert button with resolution scaling COORDINATE (10, 10)
-    boxRGBA(renderer, w - w * 0.26, 0, w - w * 0.15, 50, 150, 150, 150, 255);
-    create_text(Font, renderer, "REVERT", w - w * 0.23, 5);
+    roundedRectangleRGBA(renderer, 1150, 800, 1410, 875, 5, 255, 255, 255, 255);
+    roundedBoxRGBA(renderer, 1150, 800, 1410, 875, 5, 255, 255, 255, 100);
+    create_text(Font, renderer, "REVERT", 1235, 815);
     // Notations
     char text[2] = "A\0";
     notations(Font, renderer, text, 0);
