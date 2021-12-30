@@ -1,5 +1,7 @@
 #ifndef BOARD_REFRESH_H
 #define BOARD_REFRESH_H
+#include <SDL2/SDL.h>
+#include "data_structure.h"
 void draw_selected(SDL_Renderer *renderer, int y, int x);
 void draw_valid(SDL_Renderer *renderer, Pieces board[][8], int *valid, int size);
 void select_pawn(SDL_Renderer *renderer, SDL_Window *window, Pieces board[][8], int y, int x);

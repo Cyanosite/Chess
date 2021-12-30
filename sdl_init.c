@@ -42,10 +42,19 @@ int SDL_Init_chess(int argc, char *argv[], SDL_Window **window, SDL_Renderer **r
         printf("Error %s\n", SDL_GetError());
         return 5;
     }
+    SDL_Surface *icon = IMG_Load("Pieces/icon.png");
+    if (icon == NULL)
+    {
+        printf("Error %s\n", SDL_GetError());
+        return 6;
+    }
+    SDL_SetWindowIcon(*window, icon);
+    SDL_FreeSurface(icon);
     int w, h;
     SDL_GetWindowSize(*window, &w, &h);
     SDL_RenderSetScale(*renderer, w / 1920.0, h / 1080.0);
     SDL_RenderClear(*renderer);
+    return 0;
 }
 
 // Creates black text from the given string and puts it onto the
@@ -74,23 +83,15 @@ void notations(TTF_Font *Font, SDL_Renderer *renderer, char *text, char swap)
         {
         case 0:
             x = len * i + len / 2 - 10;
-            y = 1040;
+            y = 1038;
             break;
         case 1:
-            y = len * i + len / 2 - 15;
-            x = 1050;
+            y = len * i + len / 2 - 20;
+            x = 1052;
             break;
         }
         create_text(Font, renderer, text, x, y);
-        switch (swap)
-        {
-        case 0:
-            ++(*text);
-            break;
-        case 1:
-            --(*text);
-            break;
-        }
+        *text = swap ? --(*text) : ++(*text);
     }
 }
 
@@ -127,18 +128,15 @@ void display_default(SDL_Renderer *renderer, SDL_Window *window)
     TTF_Font *Font = TTF_OpenFont("Font.ttf", 30);
     if (Font == NULL)
         printf("error: %s", SDL_GetError());
-
-    int w, h;
-    SDL_GetWindowSize(window, &w, &h);
-    // Exit button with resolution scaling COORDINATE (8,8)
+    // Exit button COORDINATE (8,8)
     roundedRectangleRGBA(renderer, 1830, 5, 1915, 50, 5, 255, 255, 255, 255);
     roundedBoxRGBA(renderer, 1830, 5, 1915, 50, 5, 255, 255, 255, 100);
     create_text(Font, renderer, "EXIT", 1850, 5);
-    // New Game button with resolution scaling COORDINATE (9, 9)
+    // New Game button COORDINATE (9, 9)
     roundedRectangleRGBA(renderer, 1150, 700, 1410, 775, 5, 255, 255, 255, 255);
     roundedBoxRGBA(renderer, 1150, 700, 1410, 775, 5, 255, 255, 255, 100);
     create_text(Font, renderer, "NEW GAME", 1220, 715);
-    // Revert button with resolution scaling COORDINATE (10, 10)
+    // Revert button COORDINATE (10, 10)
     roundedRectangleRGBA(renderer, 1150, 800, 1410, 875, 5, 255, 255, 255, 255);
     roundedBoxRGBA(renderer, 1150, 800, 1410, 875, 5, 255, 255, 255, 100);
     create_text(Font, renderer, "REVERT", 1235, 815);

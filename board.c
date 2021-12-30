@@ -2,14 +2,15 @@
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+
 #include "data_structure.h"
-#include "sdl_init.h"
 #include "debugmalloc.h"
+#include "sdl_init.h"
 #define len 130
 const char typestring[6][7] = {{"bishop"}, {"king"}, {"knight"}, {"pawn"}, {"queen"}, {"rook"}};
 
-// draws a rounded rectangle around the selected piece (only if it has valid moves)
-// param: renderer, coordinates of the field to draw a circle around
+// draws a rounded rectangle around the selected piece (only if it has valid
+// moves) param: renderer, coordinates of the field to draw a circle around
 void draw_selected(SDL_Renderer *renderer, int y, int x)
 {
     roundedRectangleRGBA(renderer, x * len, y * len, (x + 1) * len, (y + 1) * len, 10, 0, 0, 0, 255);
@@ -188,12 +189,11 @@ void screen_refresh(Pieces board[][8], SDL_Renderer *renderer, SDL_Window *windo
     {
         roundedRectangleRGBA(renderer, 1650, 530 - 100 * i, 1850, 605 - 100 * i, 5, 255, 255, 255, 255);
         roundedBoxRGBA(renderer, 1650, 530 - 100 * i, 1850, 605 - 100 * i, 5, 255, 255, 255, 100);
-        //boxRGBA(renderer, w - 200, h - (i * 100) - 100, w, h - (i * 100), 200 + (i * 10), 200 + (i * 10), 200 + (i * 10), 255);
-
         sprintf(string, "%c%d -> %c%d", 65 + lastmove->x1, 8 - lastmove->y1, 65 + lastmove->x2, 8 - lastmove->y2);
         create_text(Font, renderer, string, 1710, 545 - 100 * i);
         lastmove = lastmove->next;
     }
+    lineRGBA(renderer, 1080, 0, 1080, 1080, 0, 0, 0, 255);
     roundedRectangleRGBA(renderer, 1150, 900, 1410, 975, 5, 255, 255, 255, 255);
     roundedBoxRGBA(renderer, 1150, 900, 1410, 975, 5, 255, 255, 255, 100);
     sprintf(string, "%s MOVES!", player == black ? "BLACK" : "WHITE");

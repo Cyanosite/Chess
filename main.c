@@ -1,11 +1,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <sdl2/SDL_ttf.h>
-#include "data_structure.h"
+
 #include "board.h"
-#include "sdl_init.h"
-#include "logic.h"
+#include "data_structure.h"
 #include "debugmalloc.h"
+#include "logic.h"
+#include "sdl_init.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,13 +16,16 @@ int main(int argc, char *argv[])
 	int errorcode = SDL_Init_chess(argc, argv, &window, &renderer);
 	if (errorcode != 0)
 		return errorcode;
-	Pieces board[8][8];										   // 2 dimensional array for the state of the board
-	Color player = white;									   // active player's color
-	int y1 = -1, x1 = -1;									   // mouse click coordinates / coordinates of the selected piece (-1 is default as the coordinates can never be negative)
+	Pieces board[8][8];	  // 2 dimensional array for the state of the board
+	Color player = white; // active player's color
+	int y1 = -1,
+		x1 = -1;											   // mouse click coordinates / coordinates of the selected piece
+															   // (-1 is default as the coordinates can never be negative)
 	bool selected = false;									   // true if a Piece is selected
 	int *valid = NULL;										   // dinamic array for valid moves (of selected piece)
 	int size = 0;											   // number of elements in the valid array
-	Move *lastmove = NULL;									   // Pointer to the last element of the dinamic list that stores previous moves
+	Move *lastmove = NULL;									   // Pointer to the last element of the dinamic list
+															   // that stores previous moves
 	board_init(board, &player);								   // Initializing the board
 	screen_refresh(board, renderer, window, player, lastmove); // Refresh the screen for the pieces to appear
 	SDL_Event event;
@@ -47,9 +51,13 @@ int main(int argc, char *argv[])
 				{
 					for (int i = 0; i < size / 2; ++i)
 					{
-						if (valid[i * 2] == y2 && valid[i * 2 + 1] == x2) // if the destination of the piece is a valid move
+						if (valid[i * 2] == y2 &&
+							valid[i * 2 + 1] ==
+								x2) // if the destination of the piece is a
+									// valid move
 						{
-							lastmove = add_move(board, lastmove, y1, x1, y2, x2);
+							lastmove =
+								add_move(board, lastmove, y1, x1, y2, x2);
 							if (board[y1][x1].type == king && abs(x1 - x2) > 1) // castling if the king is moved 2 positions
 							{
 								castling(board, y1, x1, y2, x2);
@@ -87,7 +95,6 @@ int main(int argc, char *argv[])
 										sprintf(string, "%s WINS!", player == black ? "WHITE" : "WHITE");
 										create_text(Font, renderer, string, 1200, 500);
 										TTF_CloseFont(Font);
-
 										SDL_RenderPresent(renderer);
 										reset_board(board);
 										player = white;
