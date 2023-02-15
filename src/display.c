@@ -3,12 +3,13 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include "debugmalloc.h"
+#include "data_structure.h"
 #define len 130
 
 // Initializing the SDL graphical engine, the window, the renderer,
 // the image processing and font processing engines
 // param: argc and argv from main, window and renderer
-int SDL_Init_chess(int argc, char *argv[], SDL_Window **window, SDL_Renderer **renderer)
+int SDL_Init_chess(int argc, char *argv[], SDL_Window **window, SDL_Renderer **renderer, TTF_Font **font)
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -16,7 +17,7 @@ int SDL_Init_chess(int argc, char *argv[], SDL_Window **window, SDL_Renderer **r
         return 1;
     }
 
-    *window = SDL_CreateWindow("Chess", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    *window = SDL_CreateWindow("Chess", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, SDL_WINDOW_FULLSCREEN);
     if (*window == NULL)
     {
         printf("Error %s\n", SDL_GetError());
@@ -42,6 +43,10 @@ int SDL_Init_chess(int argc, char *argv[], SDL_Window **window, SDL_Renderer **r
         printf("Error %s\n", SDL_GetError());
         return 5;
     }
+    *font = TTF_OpenFont("Font.ttf", 30);
+    if (*font == NULL)
+        printf("error: %s", SDL_GetError());
+
     SDL_Surface *icon = IMG_Load("Pieces/icon.png");
     if (icon == NULL)
     {
@@ -61,10 +66,10 @@ int SDL_Init_chess(int argc, char *argv[], SDL_Window **window, SDL_Renderer **r
 // renderer, but doesn't refresh the screen with the content
 // param: Font, renderer, the text to display,
 // and position coordinates of the text's starting point
-void create_text(TTF_Font *Font, SDL_Renderer *renderer, char *text, int w, int h)
+void create_text(TTF_Font *font, SDL_Renderer *renderer, char *text, int w, int h)
 {
     SDL_Color Black = {0, 0, 0};
-    SDL_Surface *surfaceLabel = TTF_RenderText_Blended(Font, text, Black);
+    SDL_Surface *surfaceLabel = TTF_RenderText_Blended(font, text, Black);
     SDL_Texture *Label = SDL_CreateTextureFromSurface(renderer, surfaceLabel);
     SDL_Rect rectangle = {w, h, surfaceLabel->w, surfaceLabel->h};
     SDL_RenderCopy(renderer, Label, NULL, &rectangle);
@@ -74,7 +79,7 @@ void create_text(TTF_Font *Font, SDL_Renderer *renderer, char *text, int w, int 
 
 // Creates the notations on the side of the chessboard, but doesn't display it
 // param: Font, renderer, the text to display, swap (swap the coordinates)
-void notations(TTF_Font *Font, SDL_Renderer *renderer, char *text, char swap)
+void notations(TTF_Font *font, SDL_Renderer *renderer, char *text, char swap)
 {
     for (int i = 0; i < 8; ++i)
     {
@@ -90,7 +95,7 @@ void notations(TTF_Font *Font, SDL_Renderer *renderer, char *text, char swap)
             x = 1052;
             break;
         }
-        create_text(Font, renderer, text, x, y);
+        create_text(font, renderer, text, x, y);
         *text = swap ? --(*text) : ++(*text);
     }
 }
@@ -99,9 +104,8 @@ void notations(TTF_Font *Font, SDL_Renderer *renderer, char *text, char swap)
 // the buttons on the right side
 // param: renderer, window (to get the size of the screen for auto-scaling,
 // this is not yet implemented in every function)
-void display_default(SDL_Renderer *renderer, SDL_Window *window)
+void display_default(SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font)
 {
-    TTF_Init();
     boxRGBA(renderer, 0, 0, 1080, 1080, 186, 140, 99, 255);
 
     // Create the checkerboard
@@ -125,26 +129,33 @@ void display_default(SDL_Renderer *renderer, SDL_Window *window)
             }
         }
     }
-    TTF_Font *Font = TTF_OpenFont("Font.ttf", 30);
-    if (Font == NULL)
-        printf("error: %s", SDL_GetError());
+
     // Exit button COORDINATE (8,8)
     roundedRectangleRGBA(renderer, 1830, 5, 1915, 50, 5, 255, 255, 255, 255);
     roundedBoxRGBA(renderer, 1830, 5, 1915, 50, 5, 255, 255, 255, 100);
-    create_text(Font, renderer, "EXIT", 1850, 5);
+    create_text(font, renderer, "EXIT", 1850, 5);
     // New Game button COORDINATE (9, 9)
     roundedRectangleRGBA(renderer, 1150, 700, 1410, 775, 5, 255, 255, 255, 255);
     roundedBoxRGBA(renderer, 1150, 700, 1410, 775, 5, 255, 255, 255, 100);
-    create_text(Font, renderer, "NEW GAME", 1220, 715);
+    create_text(font, renderer, "NEW GAME", 1220, 715);
     // Revert button COORDINATE (10, 10)
     roundedRectangleRGBA(renderer, 1150, 800, 1410, 875, 5, 255, 255, 255, 255);
     roundedBoxRGBA(renderer, 1150, 800, 1410, 875, 5, 255, 255, 255, 100);
-    create_text(Font, renderer, "REVERT", 1235, 815);
+    create_text(font, renderer, "REVERT", 1235, 815);
     // Notations
     char text[2] = "A\0";
-    notations(Font, renderer, text, 0);
+    notations(font, renderer, text, 0);
     text[0] = '8';
-    notations(Font, renderer, text, 1);
-    TTF_CloseFont(Font);
-    TTF_Quit();
+    notations(font, renderer, text, 1);
+}
+
+void display_win(SDL_Renderer *renderer, TTF_Font *font, Color player)
+{
+    char string[14];
+    player = invert_color(player);
+    roundedRectangleRGBA(renderer, 1150, 450, 1410, 600, 5, 255, 255, 255, 255);
+    roundedBoxRGBA(renderer, 1150, 450, 1410, 600, 5, 255, 255, 255, 100);
+    sprintf(string, "%s WINS!", player == black ? "WHITE" : "WHITE");
+    create_text(font, renderer, string, 1200, 500);
+    SDL_RenderPresent(renderer);
 }

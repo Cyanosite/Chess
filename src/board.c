@@ -5,7 +5,7 @@
 
 #include "data_structure.h"
 #include "debugmalloc.h"
-#include "sdl_init.h"
+#include "display.h"
 #define len 130
 const char typestring[6][7] = {{"bishop"}, {"king"}, {"knight"}, {"pawn"}, {"queen"}, {"rook"}};
 
@@ -157,13 +157,13 @@ void board_init(Pieces board[][8], Color *player)
 // Saves the state of the board and the active player's color into the save.txt
 // Refreshed the screen with the pieces on the board
 // Displays 5 of the latest moves and also displays the active player
-void screen_refresh(Pieces board[][8], SDL_Renderer *renderer, SDL_Window *window, Color player, Move *lastmove)
+void screen_refresh(Pieces board[][8], SDL_Renderer *renderer, SDL_Window *window, TTF_Font *font, Color player, Move *lastmove)
 {
     FILE *txt = fopen("save.txt", "w");
     fprintf(txt, "%d %d \n", txt == NULL ? 0 : 1, player);
     SDL_SetRenderDrawColor(renderer, 186, 140, 99, 255);
     SDL_RenderClear(renderer);
-    display_default(renderer, window);
+    display_default(renderer, window, font);
     for (int i = 0; i < 8; ++i)
     {
         for (int j = 0; j < 8; ++j)

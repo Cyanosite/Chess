@@ -1,4 +1,4 @@
-//#include <SDL2/SDL2_gfxPrimitives.h>
+// #include <SDL2/SDL2_gfxPrimitives.h>
 #include "data_structure.h"
 #include "logic.h" // compiler won't see some functions when needed if the header isn't included
 #include "debugmalloc.h"
@@ -409,9 +409,12 @@ int *is_valid(Pieces board[][8], int y, int x, int *size)
     return array;
 }
 
-// checks whether or not a checkmate has happened
-// if none of the Pieces can move (from the player's team) then it's checkmate
-// param: board, color of the player
+/**
+ * checks whether or not a checkmate has happened
+ * if none of the Pieces can move (from the player's team) then it's checkmate
+ * @param board
+ * @param player
+ */
 bool check_mate(Pieces board[][8], Color player)
 {
     for (int i = 0; i < 8; ++i)
