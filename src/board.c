@@ -133,7 +133,8 @@ void board_init(Pieces board[][8], Color *player)
 {
     FILE *txt = fopen("save.txt", "r");
     int firstchar;
-    fscanf(txt, "%d", &firstchar);
+    if (txt != NULL)
+        fscanf(txt, "%d", &firstchar);
     if (txt == NULL || firstchar != 1)
     {
         reset_board(board);
@@ -149,7 +150,8 @@ void board_init(Pieces board[][8], Color *player)
             }
         }
     }
-    fclose(txt);
+    if (txt != NULL)
+        fclose(txt);
 }
 
 // Saves the state of the board and the active player's color into the save.txt

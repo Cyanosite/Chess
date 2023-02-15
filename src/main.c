@@ -1,6 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
-#include <sdl2/SDL_ttf.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "board.h"
 #include "data_structure.h"
